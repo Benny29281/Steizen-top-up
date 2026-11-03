@@ -1,0 +1,2 @@
+# DocumentRoot harus ke public; tolak source jika vhost salah konfigurasi.
+Require all denied

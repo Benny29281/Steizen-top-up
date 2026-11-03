@@ -1,0 +1,2 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>@yield('code') — Steizen Store</title><link rel="stylesheet" href="/store.css"></head><body><header class="topbar"><a class="brand" href="/">STEIZEN STORE</a></header><main><section class="order-page"><span class="eyebrow">ERROR @yield('code')</span><h1>@yield('heading')</h1><p class="muted">@yield('message')</p><a class="button" href="/">Kembali ke katalog →</a></section></main></body></html>

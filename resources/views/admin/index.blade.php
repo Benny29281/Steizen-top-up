@@ -1,0 +1,23 @@
+@extends('layouts.store')
+@section('title', 'Pengelolaan — Steizen Store')
+@section('content')
+<div class="section-heading"><div><span class="eyebrow">AREA PENGELOLA</span><h1 class="admin-title">Dashboard</h1><p class="muted">{{ $orderCount }} pesanan simulasi · {{ $games->count() }} game · sumber katalog: {{ config('store.catalog_source') }}</p></div></div>
+<section><h2>Game</h2><div class="admin-games">@foreach($games as $game)<form class="admin-game" action="{{ route('admin.games.update', $game) }}" method="post">@csrf @method('PATCH')<strong>{{ $game->name }}</strong><label><span class="sr-only">Status {{ $game->name }}</span><select name="active"><option value="1" @selected($game->active)>Aktif</option><option value="0" @selected(!$game->active)>Nonaktif</option></select></label><button class="small-button" type="submit">Simpan</button></form>@endforeach</div></section>
+<section class="admin-section" id="tambah-nominal">
+    <h2>Tambah nominal</h2>
+    <p class="muted">Tambahkan jumlah sesuai mata uang game, misalnya 86 untuk 86 Diamonds. Produk manual adalah produk demo. Produk Digiflazz ditambahkan melalui sinkronisasi supplier.</p>
+    <form class="add-product-form" action="{{ route('admin.products.store') }}" method="post">
+        @csrf
+        <div class="fields">
+            <label for="create-game">Game<select id="create-game" name="create_game_id" required><option value="">Pilih game</option>@foreach($games as $game)<option value="{{ $game->id }}" @selected(is_scalar(old('create_game_id')) && (string) old('create_game_id') === (string) $game->id)>{{ $game->name }} — {{ $game->unit }}{{ !$game->active ? ' (game nonaktif)' : '' }}</option>@endforeach</select></label>
+            <label for="create-quantity">Jumlah nominal<input id="create-quantity" type="number" name="quantity" min="1" max="1000000" step="1" value="{{ is_scalar(old('quantity')) ? old('quantity') : '' }}" placeholder="Contoh: 86" required></label>
+            <label for="create-price">Harga jual (Rp)<input id="create-price" type="number" name="create_price" min="1" max="100000000" step="1" value="{{ is_scalar(old('create_price')) ? old('create_price') : '' }}" placeholder="Contoh: 20000" required></label>
+            <label for="create-active">Status<select id="create-active" name="create_active" required><option value="1" @selected(old('create_active', '1') === '1')>Aktif</option><option value="0" @selected(old('create_active') === '0')>Nonaktif</option></select></label>
+        </div>
+        <button class="button" type="submit">Tambah nominal</button>
+    </form>
+</section>
+<section class="admin-section"><h2>Produk</h2><p class="muted">Harga demo dapat diubah. Harga produk supplier dihitung saat sinkronisasi sesuai margin server.</p><div class="admin-products">@foreach($products as $product)<form class="admin-product" action="{{ route('admin.products.update', $product) }}" method="post">@csrf @method('PATCH')<div><strong>{{ $product->name }}</strong><small>{{ $product->game->name }} · {{ $product->source }}</small></div><label>Harga (Rp)<input type="number" name="price" min="1" max="100000000" value="{{ $product->price }}" @readonly($product->source !== 'demo') required></label><label>Status<select name="active"><option value="1" @selected($product->active)>Aktif</option><option value="0" @selected(!$product->active)>Nonaktif</option></select></label><button class="small-button" type="submit">Simpan</button></form>@endforeach</div>{{ $products->links('partials.pagination') }}</section>
+<section class="admin-section"><h2>Pesanan terbaru</h2><div class="table-wrap"><table><thead><tr><th>Referensi</th><th>Game / produk</th><th>Total</th><th>Pembayaran</th></tr></thead><tbody>@forelse($orders as $order)<tr><td>{{ $order->reference }}</td><td>{{ $order->game_name }}<small>{{ $order->product_name }}</small></td><td>Rp {{ number_format($order->price + $order->fee, 0, ',', '.') }}</td><td>{{ $order->payment?->label() ?? $order->status }}<small>{{ $order->payment?->invoice_number }}</small></td></tr>@empty<tr><td colspan="4">Belum ada pesanan.</td></tr>@endforelse</tbody></table></div>{{ $orders->links('partials.pagination') }}</section>
+<section class="admin-section"><h2>Aktivitas admin</h2><div class="table-wrap"><table><thead><tr><th>Waktu (WIB)</th><th>Admin</th><th>Aksi</th><th>Objek</th></tr></thead><tbody>@forelse($auditLogs as $log)<tr><td>{{ $log->created_at->timezone('Asia/Jakarta')->format('d M Y H:i') }}</td><td>#{{ $log->user_id }}</td><td>{{ $log->action }}</td><td>{{ $log->entity_type }} #{{ $log->entity_id }}</td></tr>@empty<tr><td colspan="4">Belum ada perubahan.</td></tr>@endforelse</tbody></table></div></section>
+@endsection

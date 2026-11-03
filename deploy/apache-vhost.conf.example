@@ -1,0 +1,15 @@
+# Contoh; sesuaikan domain, TLS, modul PHP 8.4+, dan path untuk server Anda.
+# Jangan memasukkan file ini ke direktori publik atau mengaktifkannya tanpa meninjau konfigurasi server.
+<VirtualHost *:80>
+    ServerName steizen2.test
+    DocumentRoot "C:/laragon/www/steizen2/public"
+    <Directory "C:/laragon/www/steizen2/public">
+        AllowOverride All
+        Options -Indexes +FollowSymLinks
+        Require all granted
+    </Directory>
+</VirtualHost>
+
+# Vhost HTTP di atas hanya untuk pengembangan lokal.
+# Produksi wajib HTTPS, APP_ENV=production, APP_DEBUG=false,
+# SESSION_SECURE_COOKIE=true dan APP_URL yang cocok dengan domain.
